@@ -46,7 +46,7 @@ function login() {
       // optional storage
       localStorage.setItem("username", data.username);
 
-      window.location.href = "stations.html";
+      window.location.href = "mainpage.html";
     } 
     else {
       alert(data.message);
