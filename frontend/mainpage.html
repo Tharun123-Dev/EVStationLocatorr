@@ -1155,7 +1155,7 @@
 // SUPER EASY DJANGO CONNECTION (BEGINNER)
 // ======================================
 
-const API_URL = 'http://127.0.0.1:8000/api/';
+const API_URL = 'http://127.0.0.1:8000/api/accounts/';
 
 // ⭐ 1. SIMPLE API CALL FUNCTION
 function apiCall(url, method='GET', data=null) {
@@ -1306,26 +1306,7 @@ function renderStations(stations) {
 }
 
 // ⭐ 4. SEARCH STATIONS (optional - same style)
-// document.getElementById('locatorBtn').onclick = function() {
-//     var q = document.getElementById('searchArea').value;
-//     var connector = document.getElementById('connectorFilter').value;
-//     var speed = document.getElementById('speedFilter').value;
-//     var open = document.getElementById('openNowFilter').checked;
 
-//     var url = API_URL + 'search-stations/?';
-//     if (q) url += 'q=' + encodeURIComponent(q) + '&';
-//     if (connector != 'any') url += 'connector=' + connector + '&';
-//     if (speed != 'any') url += 'speed=' + speed + '&';
-//     if (open) url += 'open_now=true';
-
-//     apiCall(url).then(function(data) {
-//         var count = (data.stations && data.stations.length) ? data.stations.length : 0;
-//         document.getElementById('locatorResult').textContent = 'Found ' + count + ' stations';
-//         if (data.stations) {
-//             renderStations(data.stations);
-//         }
-//     });
-// };
 document.getElementById('locatorBtn').onclick = function () {
     // Example count (since backend filter not used now)
     const foundCount = document.querySelectorAll('#stationList .card').length;
