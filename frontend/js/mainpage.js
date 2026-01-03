@@ -75,6 +75,10 @@ function loadStations() {
       console.error("Error loading stations:", err);
     });
 }
+function openHelpPage() {
+    window.location.href = "help.html";
+  }
+
 
 /* START */
 window.onload = function () {

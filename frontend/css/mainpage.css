@@ -54,7 +54,43 @@
     nav a.active { background: #22c55e; color: #020617; }
     nav a:hover { background: rgba(31, 41, 55, 0.9); }
 
-    .nav-buttons { display: flex; gap: 8px; }
+   /* MESSAGE ICON */
+/* HELP ICON – PROFESSIONAL LOOK */
+.help-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.12); /* subtle green */
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.help-icon img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.9;
+}
+
+/* Hover effect */
+.help-icon:hover {
+  background: rgba(34, 197, 94, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.25);
+}
+
+
+
+/* MOBILE FIX */
+@media (max-width: 768px) {
+  .help-icon {
+    margin-left: auto;
+  }
+}
+
 
     .btn {
       border-radius: 999px;
