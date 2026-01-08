@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Payment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  font-family: Arial;
+  padding: 20px;
+}
+.card {
+  max-width: 400px;
+  margin: auto;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 10px;
+}
+button {
+  width: 100%;
+  padding: 10px;
+  background: #0a7cff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Payment (Demo)</h2>
+  <p id="details"></p>
+
+  <input placeholder="Card Number (demo)" /><br><br>
+  <input placeholder="Expiry" /><br><br>
+  <input placeholder="CVV" /><br><br>
+
+  <button onclick="completePayment()">Pay ₹250</button>
+</div>
+
+<script>
+const booking = JSON.parse(localStorage.getItem("currentBooking"));
+document.getElementById("details").innerText =
+  booking.station + " | Slot: " + booking.slot;
+
+function completePayment() {
+  let history = JSON.parse(localStorage.getItem("history")) || [];
+  history.push(booking);
+  localStorage.setItem("history", JSON.stringify(history));
+  alert("Payment Successful (Demo)");
+  window.location.href = "history.html";
+}
+</script>
+
+</body>
+</html>

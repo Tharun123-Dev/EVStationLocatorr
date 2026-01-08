@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nearby EV Charging Stations</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Leaflet Map CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+/* ===== BASIC PAGE STYLES ===== */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f4f6f9;
+}
+
+/* Header */
+header {
+  padding: 12px;
+  text-align: center;
+  background: #0a7cff;
+  color: white;
+}
+
+/* Top buttons */
+.controls {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+}
+
+button {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: #0a7cff;
+  color: white;
+  cursor: pointer;
+}
+
+/* Map area */
+#map {
+  height: 300px;
+}
+
+/* Content area */
+.container {
+  padding: 15px;
+}
+
+/* Station card */
+.station {
+  background: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border-left: 4px solid #ddd;
+}
+
+/* Active (selected) station */
+.station.active {
+  border-left-color: #00c853;
+  background: #f4fff8;
+}
+
+/* Directions text */
+.directions {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Dark mode */
+body.dark {
+  background: #121212;
+  color: #fff;
+}
+body.dark header {
+  background: #000;
+}
+body.dark .station {
+  background: #1e1e1e;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h3>Nearby EV Charging Stations</h3>
+</header>
+
+<!-- Control buttons -->
+<div class="controls">
+  <button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+  <button onclick="sortByDistance()">📊 Sort by Distance</button>
+</div>
+
+<!-- Map -->
+<div id="map"></div>
+
+<!-- Station list -->
+<div class="container">
+  <div id="stationList"></div>
+</div>
+
+<!-- Leaflet Map JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+/* ===== GLOBAL VARIABLES ===== */
+let map;
+let userLat, userLng;
+let routeLayer;
+
+/* ===== SAMPLE EV STATIONS (HYDERABAD) ===== */
+const stations = [
+  { name: "Tata Power EV – Banjara Hills", lat: 17.4123, lng: 78.4484, area: "Banjara Hills", distance: 2.1 },
+  { name: "Ather Grid – Gachibowli", lat: 17.4401, lng: 78.3489, area: "Gachibowli", distance: 3.6 },
+  { name: "ChargeZone – Kukatpally", lat: 17.4948, lng: 78.3996, area: "Kukatpally", distance: 4.9 }
+];
+
+const stationList = document.getElementById("stationList");
+
+/* ===== GET USER LOCATION ===== */
+navigator.geolocation.getCurrentPosition(
+  position => {
+    userLat = position.coords.latitude;
+    userLng = position.coords.longitude;
+    initMap(userLat, userLng);
+    renderStations();
+  },
+  () => {
+    // If user denies location
+    userLat = 17.3850;
+    userLng = 78.4867;
+    initMap(userLat, userLng);
+    renderStations();
+  }
+);
+
+/* ===== INITIALIZE MAP ===== */
+function initMap(lat, lng) {
+  map = L.map("map").setView([lat, lng], 12);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap"
+  }).addTo(map);
+
+  // User marker
+  L.marker([lat, lng]).addTo(map)
+    .bindPopup("You are here")
+    .openPopup();
+
+  // Station markers
+  stations.forEach(s => {
+    L.marker([s.lat, s.lng]).addTo(map)
+      .bindPopup(s.name);
+  });
+}
+
+/* ===== SHOW STATION LIST ===== */
+function renderStations() {
+  stationList.innerHTML = "";
+
+  stations.forEach((s, index) => {
+    stationList.innerHTML += `
+      <div class="station" id="station-${index}">
+        <b>${s.name}</b>
+        <p>Area: ${s.area}</p>
+        <p>Distance: ${s.distance} km</p>
+
+        <button onclick="getDirections(${index})">
+          Get Directions
+        </button>
+
+        <div class="directions"></div>
+      </div>
+    `;
+  });
+}
+
+/* ===== SORT BY DISTANCE ===== */
+function sortByDistance() {
+  stations.sort((a, b) => a.distance - b.distance);
+  renderStations();
+}
+
+/* ===== GET DIRECTIONS ===== */
+function getDirections(index) {
+  const station = stations[index];
+
+  // Highlight selected station
+  document.querySelectorAll(".station").forEach(el => el.classList.remove("active"));
+  document.getElementById(`station-${index}`).classList.add("active");
+
+  // Remove old route
+  if (routeLayer) {
+    map.removeLayer(routeLayer);
+  }
+
+  // OSRM routing API (free)
+  const url = `https://router.project-osrm.org/route/v1/driving/${userLng},${userLat};${station.lng},${station.lat}?overview=full&geometries=geojson`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const route = data.routes[0];
+
+      // Draw route line
+      routeLayer = L.geoJSON(route.geometry, {
+        style: { color: "#0a7cff", weight: 5 }
+      }).addTo(map);
+
+      map.fitBounds(routeLayer.getBounds());
+
+      // Show ETA and distance
+      const km = (route.distance / 1000).toFixed(2);
+      const min = Math.ceil(route.duration / 60);
+
+      document.querySelector(`#station-${index} .directions`).innerHTML = `
+        <b>ETA:</b> ${min} min<br>
+        <b>Distance:</b> ${km} km<br><br>
+
+        <button onclick="openGoogleMaps(${station.lat}, ${station.lng})">
+          🧭 Open in Google Maps
+        </button>
+      `;
+    });
+}
+
+/* ===== OPEN GOOGLE MAPS ===== */
+function openGoogleMaps(lat, lng) {
+  window.open(
+    `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${lat},${lng}`,
+    "_blank"
+  );
+}
+
+/* ===== DARK MODE ===== */
+function toggleDarkMode() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark", document.body.classList.contains("dark"));
+}
+
+// Restore dark mode
+if (localStorage.getItem("dark") === "true") {
+  document.body.classList.add("dark");
+}
+</script>
+
+</body>
+</html>
