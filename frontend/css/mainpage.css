@@ -51,8 +51,8 @@
       transition: background 0.2s;
     }
 
-    nav a.active { background: #22c55e; color: #020617; }
-    nav a:hover { background: rgba(31, 41, 55, 0.9); }
+    /* nav a.active { background: #22c55e; color: #020617; } */
+    nav a:hover { background: rgba(91, 234, 210, 0.9); }
 
    /* MESSAGE ICON */
 /* HELP ICON – PROFESSIONAL LOOK */
