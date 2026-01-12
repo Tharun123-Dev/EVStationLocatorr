@@ -153,6 +153,7 @@ body::before {
     <input id="password" type="password" class="form-control mb-3" placeholder="Password">
 
     <button class="loginbtn" onclick="login()">Login</button>
+        <button class="loginbtn" onclick="loginn()">Guest Login(clickhere)</button>
 </div>
 
 <script>
@@ -160,6 +161,9 @@ function login(){
     alert("Login Successful ✨");
 }
 
+function loginn(){
+  window.location.href="./mainpage.html"
+}
 
 </script>
 

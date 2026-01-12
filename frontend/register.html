@@ -154,11 +154,15 @@ body::before {
     <input id="password" type="password" class="form-control mb-3" placeholder="Password">
 
     <button class="loginbtn" onclick="register()">Register</button>
+      <button class="loginbtn" onclick="registerr()">Guest Login(clickHere)</button>
 </div>
 
 <script>
 function register(){
     alert("Registration Successful 🎉");
+}
+function registerr(){
+    window.location.href='./mainpage.html'
 }
 
 </script>
